@@ -1,45 +1,46 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Elementos de entrada
     const estimatedSavingsInput = document.getElementById('estimatedSavings');
     const caeMarketPriceInput = document.getElementById('caeMarketPrice');
     const administrativeCostValueInput = document.getElementById('administrativeCostValue');
     const administrativeCostTypeSelect = document.getElementById('administrativeCostType');
     const verificationCostValueInput = document.getElementById('verificationCostValue');
     const verificationCostTypeSelect = document.getElementById('verificationCostType');
-    const sujetoDelegadoShareInput = document.getElementById('sujetoDelegadoShare');
-    const intermediaryCommissionInput = document.getElementById('intermediaryCommission');
     const calculateBtn = document.getElementById('calculateBtn');
 
+    // Elementos de resultados
     const totalCAEValueSpan = document.getElementById('totalCAEValue');
-    const administrativeCostDisplaySpan = document.getElementById('administrativeCostDisplay');
-    const verificationCostDisplaySpan = document.getElementById('verificationCostDisplay');
-    const valueAfterAllCostsSpan = document.getElementById('valueAfterAllCosts');
-    const ownerGrossSpan = document.getElementById('ownerGross');
-    const intermediaryNetSpan = document.getElementById('intermediaryNet');
+    const totalManagementCostsSpan = document.getElementById('totalManagementCosts');
     const ownerNetSpan = document.getElementById('ownerNet');
-    const sdBenefitDisplaySpan = document.getElementById('sdBenefitDisplay'); // Get the new SD benefit display element
     const messageBox = document.getElementById('messageBox');
 
+    // Valores predeterminados para los campos eliminados
+    const sujetoDelegadoShare = 80; // 80%
+    const intermediaryCommission = 11.3; // 11.3%
+
+    // Función para mostrar mensajes
     const displayMessage = (message, type = 'error') => {
         messageBox.textContent = message;
         messageBox.className = `mt-6 p-3 rounded-md ${type === 'error' ? 'bg-red-100 border border-red-400 text-red-700' : 'bg-green-100 border border-green-400 text-green-700'}`;
         messageBox.classList.remove('hidden');
     };
 
+    // Función para ocultar mensajes
     const hideMessage = () => {
         messageBox.classList.add('hidden');
     };
 
+    // Función de cálculo
     const calculateCAE = () => {
         hideMessage(); // Ocultar mensajes previos
 
+        // Obtener valores de entrada
         const estimatedSavings = parseFloat(estimatedSavingsInput.value);
         const caeMarketPrice = parseFloat(caeMarketPriceInput.value);
         const administrativeCostValue = parseFloat(administrativeCostValueInput.value);
         const administrativeCostType = administrativeCostTypeSelect.value;
         const verificationCostValue = parseFloat(verificationCostValueInput.value);
         const verificationCostType = verificationCostTypeSelect.value;
-        const sujetoDelegadoShare = parseFloat(sujetoDelegadoShareInput.value);
-        const intermediaryCommission = parseFloat(intermediaryCommissionInput.value);
 
         // Validaciones de entrada
         if (isNaN(estimatedSavings) || estimatedSavings < 0) {
@@ -58,18 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
             displayMessage('Por favor, introduce un valor válido para el Coste de Entidad de Verificación.');
             return;
         }
-        if (isNaN(sujetoDelegadoShare) || sujetoDelegadoShare < 0 || sujetoDelegadoShare > 100) {
-            displayMessage('El Porcentaje para el Propietario debe ser un valor entre 0 y 100.');
-            return;
-        }
-        if (isNaN(intermediaryCommission) || intermediaryCommission < 0 || intermediaryCommission > 100) {
-            displayMessage('La Comisión del Intermediario debe ser un valor entre 0 y 100.');
-            return;
-        }
 
         // Cálculos
         const totalCAEValue = estimatedSavings * caeMarketPrice;
 
+        // Calcular Costes Administrativos
         let administrativeCost = 0;
         if (administrativeCostType === 'fixed') {
             administrativeCost = administrativeCostValue;
@@ -77,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             administrativeCost = totalCAEValue * (administrativeCostValue / 100);
         }
 
+        // Calcular Coste de Verificación
         let verificationCost = 0;
         if (verificationCostType === 'fixed') {
             verificationCost = verificationCostValue;
@@ -84,38 +79,40 @@ document.addEventListener('DOMContentLoaded', () => {
             verificationCost = totalCAEValue * (verificationCostValue / 100);
         }
 
+        // Calcular Valor Neto para Reparto
         const valueAfterAllCosts = totalCAEValue - administrativeCost - verificationCost;
 
         // Asegurarse de que el valor para reparto no sea negativo
         if (valueAfterAllCosts < 0) {
             displayMessage('La suma de los costes administrativos y de verificación supera el valor total de los CAEs generados. Ajusta los valores.', 'error');
             totalCAEValueSpan.textContent = `${totalCAEValue.toFixed(2)} €`;
-            administrativeCostDisplaySpan.textContent = `${administrativeCost.toFixed(2)} €`;
-            verificationCostDisplaySpan.textContent = `${verificationCost.toFixed(2)} €`;
-            valueAfterAllCostsSpan.textContent = `0.00 €`;
-            ownerGrossSpan.textContent = `0.00 €`;
-            intermediaryNetSpan.textContent = `0.00 €`;
+            totalManagementCostsSpan.textContent = `0.00 €`;
             ownerNetSpan.textContent = `0.00 €`;
-            sdBenefitDisplaySpan.textContent = `0.00 €`; // Also reset SD benefit
             return;
         }
 
+        // Calcular Beneficio del Propietario (bruto)
         const ownerGross = valueAfterAllCosts * (sujetoDelegadoShare / 100);
+
+        // Calcular Comisión del Intermediario
         const intermediaryCut = ownerGross * (intermediaryCommission / 100);
+
+        // Calcular Beneficio del Propietario (neto)
         const ownerNet = ownerGross - intermediaryCut;
-        const sdBenefit = valueAfterAllCosts - ownerGross; // Calculate SD benefit
+
+        // Calcular Beneficio del Sujeto Delegado
+        const sdBenefit = valueAfterAllCosts - ownerGross;
+
+        // Calcular Gastos Totales de Gestión
+        const totalManagementCosts = administrativeCost + verificationCost + sdBenefit + intermediaryCut;
 
         // Mostrar resultados
         totalCAEValueSpan.textContent = `${totalCAEValue.toFixed(2)} €`;
-        administrativeCostDisplaySpan.textContent = `${administrativeCost.toFixed(2)} €`;
-        verificationCostDisplaySpan.textContent = `${verificationCost.toFixed(2)} €`;
-        valueAfterAllCostsSpan.textContent = `${valueAfterAllCosts.toFixed(2)} €`;
-        ownerGrossSpan.textContent = `${ownerGross.toFixed(2)} €`;
-        intermediaryNetSpan.textContent = `${intermediaryCut.toFixed(2)} €`;
+        totalManagementCostsSpan.textContent = `${totalManagementCosts.toFixed(2)} €`;
         ownerNetSpan.textContent = `${ownerNet.toFixed(2)} €`;
-        sdBenefitDisplaySpan.textContent = `${sdBenefit.toFixed(2)} €`; // Display SD benefit
     };
 
+    // Event Listeners
     calculateBtn.addEventListener('click', calculateCAE);
     administrativeCostTypeSelect.addEventListener('change', calculateCAE);
     verificationCostTypeSelect.addEventListener('change', calculateCAE);
