@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const estimatedSavingsInput = document.getElementById('estimatedSavings');
     const caeMarketPriceInput = document.getElementById('caeMarketPrice');
     const administrativeCostValueInput = document.getElementById('administrativeCostValue');
-    const administrativeCostTypeSelect = document.getElementById('administrativeCostType');
+    const administrativeCostTypeSelect = document.getElementById('administrativeCostType'); // Fixed ID
     const verificationCostValueInput = document.getElementById('verificationCostValue');
     const verificationCostTypeSelect = document.getElementById('verificationCostType');
     const calculateBtn = document.getElementById('calculateBtn');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ownerNetSpan = document.getElementById('ownerNet');
     const messageBox = document.getElementById('messageBox');
 
-    // Valores predeterminados
+    // Valores predeterminados para los campos eliminados
     const sujetoDelegadoShare = 80; // 80%
     const intermediaryCommission = 11.3; // 11.3%
 
@@ -32,17 +32,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función de cálculo
     const calculateCAE = () => {
-        hideMessage();
+        hideMessage(); // Ocultar mensajes previos
 
-        // Obtener valores de entrada con valores por defecto si están vacíos
-        const estimatedSavings = parseFloat(estimatedSavingsInput.value) || 30;
-        const caeMarketPrice = parseFloat(caeMarketPriceInput.value) || 120;
-        const administrativeCostValue = parseFloat(administrativeCostValueInput.value) || 1200;
+        // Obtener valores de entrada
+        const estimatedSavings = parseFloat(estimatedSavingsInput.value);
+        const caeMarketPrice = parseFloat(caeMarketPriceInput.value);
+        const administrativeCostValue = parseFloat(administrativeCostValueInput.value);
         const administrativeCostType = administrativeCostTypeSelect.value;
-        const verificationCostValue = parseFloat(verificationCostValueInput.value) || 1000;
+        const verificationCostValue = parseFloat(verificationCostValueInput.value);
         const verificationCostType = verificationCostTypeSelect.value;
 
-        // Validaciones
+        // Depuración
+        console.log('Entradas:', {
+            estimatedSavings,
+            caeMarketPrice,
+            administrativeCostValue,
+            administrativeCostType,
+            verificationCostValue,
+            verificationCostType
+        });
+
+        // Validaciones de entrada
         if (isNaN(estimatedSavings) || estimatedSavings < 0) {
             displayMessage('Por favor, introduce un valor válido para el Ahorro Energético Estimado (MWh/año).');
             return;
@@ -64,32 +74,60 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalCAEValue = estimatedSavings * caeMarketPrice;
 
         // Calcular Costes Administrativos
-        let administrativeCost = administrativeCostType === 'fixed' 
-            ? administrativeCostValue 
-            : totalCAEValue * (administrativeCostValue / 100);
+        let administrativeCost = 0;
+        if (administrativeCostType === 'fixed') {
+            administrativeCost = administrativeCostValue;
+        } else { // percentage
+            administrativeCost = totalCAEValue * (administrativeCostValue / 100);
+        }
 
         // Calcular Coste de Verificación
-        let verificationCost = verificationCostType === 'fixed' 
-            ? verificationCostValue 
-            : totalCAEValue * (verificationCostValue / 100);
+        let verificationCost = 0;
+        if (verificationCostType === 'fixed') {
+            verificationCost = verificationCostValue;
+        } else { // percentage
+            verificationCost = totalCAEValue * (verificationCostValue / 100);
+        }
 
         // Calcular Valor Neto para Reparto
         const valueAfterAllCosts = totalCAEValue - administrativeCost - verificationCost;
 
+        // Asegurarse de que el valor para reparto no sea negativo
         if (valueAfterAllCosts < 0) {
-            displayMessage('La suma de los costes supera el valor total de los CAEs generados. Ajusta los valores.', 'error');
+            displayMessage('La suma de los costes administrativos y de verificación supera el valor total de los CAEs generados. Ajusta los valores.', 'error');
             totalCAEValueSpan.textContent = `${totalCAEValue.toFixed(2)} €`;
             totalManagementCostsSpan.textContent = `0.00 €`;
             ownerNetSpan.textContent = `0.00 €`;
             return;
         }
 
-        // Calcular Beneficios
+        // Calcular Beneficio del Propietario (bruto)
         const ownerGross = valueAfterAllCosts * (sujetoDelegadoShare / 100);
+
+        // Calcular Comisión del Intermediario
         const intermediaryCut = ownerGross * (intermediaryCommission / 100);
+
+        // Calcular Beneficio del Propietario (neto)
         const ownerNet = ownerGross - intermediaryCut;
+
+        // Calcular Beneficio del Sujeto Delegado
         const sdBenefit = valueAfterAllCosts - ownerGross;
+
+        // Calcular Gastos Totales de Gestión
         const totalManagementCosts = administrativeCost + verificationCost + sdBenefit + intermediaryCut;
+
+        // Depuración
+        console.log('Resultados:', {
+            totalCAEValue,
+            administrativeCost,
+            verificationCost,
+            valueAfterAllCosts,
+            ownerGross,
+            intermediaryCut,
+            ownerNet,
+            sdBenefit,
+            totalManagementCosts
+        });
 
         // Mostrar resultados
         totalCAEValueSpan.textContent = `${totalCAEValue.toFixed(2)} €`;
@@ -101,13 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     calculateBtn.addEventListener('click', calculateCAE);
     administrativeCostTypeSelect.addEventListener('change', calculateCAE);
     verificationCostTypeSelect.addEventListener('change', calculateCAE);
-    
-    // Agregar event listeners para cambios en los inputs numéricos
-    estimatedSavingsInput.addEventListener('input', calculateCAE);
-    caeMarketPriceInput.addEventListener('input', calculateCAE);
-    administrativeCostValueInput.addEventListener('input', calculateCAE);
-    verificationCostValueInput.addEventListener('input', calculateCAE);
 
-    // Ejecutar cálculo inicial después de un breve retraso para asegurar que el DOM está listo
-    setTimeout(calculateCAE, 100);
+    // Realizar un cálculo inicial al cargar la página con los valores por defecto
+    calculateCAE();
 });
