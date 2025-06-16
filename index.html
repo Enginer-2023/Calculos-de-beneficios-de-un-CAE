@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Ahorro Energético (CAE)</title>
+    <!-- Incluye Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Enlaza tu archivo de estilos personalizado -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-lg shadow-xl max-w-lg w-full border border-gray-200">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Calculadora de CAE</h1>
+
+        <div class="space-y-4">
+            <div>
+                <label for="estimatedSavings" class="label-style">Ahorro Energético Estimado (MWh/año)</label>
+                <input type="number" id="estimatedSavings" class="input-field" value="30" min="0" step="0.1">
+            </div>
+
+            <div>
+                <label for="caeMarketPrice" class="label-style">Precio de Mercado del CAE (€/MWh)</label>
+                <input type="number" id="caeMarketPrice" class="input-field" value="120" min="0" step="0.01">
+            </div>
+
+            <div>
+                <label for="administrativeCostValue" class="label-style">Costes de Gestión Administrativa</label>
+                <div class="flex space-x-2">
+                    <input type="number" id="administrativeCostValue" class="input-field flex-grow" value="800" min="0" step="0.01">
+                    <select id="administrativeCostType" class="input-field w-auto">
+                        <option value="fixed">Fijo (€)</option>
+                        <option value="percentage">Porcentaje (%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="verificationCostValue" class="label-style">Coste de Entidad de Verificación</label>
+                <div class="flex space-x-2">
+                    <input type="number" id="verificationCostValue" class="input-field flex-grow" value="750" min="0" step="0.01">
+                    <select id="verificationCostType" class="input-field w-auto">
+                        <option value="fixed">Fijo (€)</option>
+                        <option value="percentage">Porcentaje (%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="sujetoDelegadoShare" class="label-style">Porcentaje para el Propietario (del SD) (%)</label>
+                <input type="number" id="sujetoDelegadoShare" class="input-field" value="80" min="0" max="100" step="0.1">
+            </div>
+
+            <div>
+                <label for="intermediaryCommission" class="label-style">Comisión del Intermediario (sobre lo del Propietario) (%)</label>
+                <input type="number" id="intermediaryCommission" class="input-field" value="11.3" min="0" max="100" step="0.1">
+            </div>
+
+            <button id="calculateBtn" class="btn-calculate w-full mt-6">Calcular</button>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-200 space-y-3">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Resultados</h2>
+            <div class="flex justify-between items-center text-lg">
+                <span class="text-gray-700">Valor Total de CAEs Generados:</span>
+                <span id="totalCAEValue" class="font-bold text-green-700">0.00 €</span>
+            </div>
+            <div class="flex justify-between items-center text-lg">
+                <span class="text-gray-700">Costes Administrativos:</span>
+                <span id="administrativeCostDisplay" class="font-bold text-red-600">0.00 €</span>
+            </div>
+            <div class="flex justify-between items-center text-lg">
+                <span class="text-gray-700">Coste de Verificación:</span>
+                <span id="verificationCostDisplay" class="font-bold text-red-600">0.00 €</span>
+            </div>
+            <div class="flex justify-between items-center text-lg">
+                <span class="text-gray-700">Valor Neto para Reparto:</span>
+                <span id="valueAfterAllCosts" class="font-bold text-green-700">0.00 €</span>
+            </div>
+                        <!-- Nueva fila para el beneficio del SD -->
+             <div class="flex justify-between items-center text-lg">
+                <span class="text-gray-800">Beneficio del Sujeto Delegado:</span>
+                <span id="sdBenefitDisplay" class="font-bold text-purple-700">0.00 €</span>
+            </div>
+            <div class="flex justify-between items-center text-lg">
+                <span class="text-gray-700">El Propietario Percibe (bruto):</span>
+                <span id="ownerGross" class="font-bold text-green-700">0.00 €</span>
+            </div>
+            <div class="flex justify-between items-center text-lg">
+                <span class="text-gray-700">Comisión del Intermediario:</span>
+                <span id="intermediaryNet" class="font-bold text-red-600">0.00 €</span>
+            </div>
+
+            <div class="flex justify-between items-center text-lg pt-2 border-t border-gray-200 font-semibold">
+                <span class="text-gray-800">El Propietario Percibe (neto):</span>
+                <span id="ownerNet" class="font-bold text-blue-700">0.00 €</span>
+            </div> 
+        </div>
+
+        <div id="messageBox" class="mt-6 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md hidden" role="alert">
+            <!-- Mensajes de error aquí -->
+        </div>
+    </div>
+
+    <!-- Enlaza tu archivo de script -->
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6; /* Gris claro de Tailwind */
+}
+/* Estilos personalizados para el botón */
+.btn-calculate {
+    background-color: #2563eb; /* Azul de Tailwind */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.btn-calculate:hover {
+    background-color: #1d4ed8; /* Azul más oscuro al pasar el ratón */
+    transform: translateY(-1px);
+}
+.btn-calculate:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+.input-field {
+    padding: 0.625rem 1rem;
+    border-radius: 0.375rem; /* rounded-md */
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    width: 100%;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.input-field:focus {
+    outline: none;
+    border-color: #2563eb; /* focus:border-blue-500 */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* focus:ring focus:ring-blue-200 */
+}
+.label-style {
+    font-weight: 500; /* font-medium */
+    color: #374151; /* text-gray-700 */
+    margin-bottom: 0.25rem; /* mb-1 */
+    display: block;
+}
