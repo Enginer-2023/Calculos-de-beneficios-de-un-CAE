@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const estimatedSavingsInput = document.getElementById('estimatedSavings');
     const caeMarketPriceInput = document.getElementById('caeMarketPrice');
     const administrativeCostValueInput = document.getElementById('administrativeCostValue');
-    const administrativeCostTypeSelect = document.getElementById('administrativeCostType');
+    const administrativeCostTypeSelect = document.getElementById('irenownedCostType');
     const verificationCostValueInput = document.getElementById('verificationCostValue');
     const verificationCostTypeSelect = document.getElementById('verificationCostType');
     const calculateBtn = document.getElementById('calculateBtn');
@@ -41,6 +41,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const administrativeCostType = administrativeCostTypeSelect.value;
         const verificationCostValue = parseFloat(verificationCostValueInput.value);
         const verificationCostType = verificationCostTypeSelect.value;
+
+        // Depuración
+        console.log('Entradas:', {
+            estimatedSavings,
+            caeMarketPrice,
+            administrativeCostValue,
+            administrativeCostType,
+            verificationCostValue,
+            verificationCostType
+        });
 
         // Validaciones de entrada
         if (isNaN(estimatedSavings) || estimatedSavings < 0) {
@@ -105,6 +115,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Calcular Gastos Totales de Gestión
         const totalManagementCosts = administrativeCost + verificationCost + sdBenefit + intermediaryCut;
+
+        // Depuración
+        console.log('Resultados:', {
+            totalCAEValue,
+            administrativeCost,
+            verificationCost,
+            valueAfterAllCosts,
+            ownerGross,
+            intermediaryCut,
+            ownerNet,
+            sdBenefit,
+            totalManagementCosts
+        });
 
         // Mostrar resultados
         totalCAEValueSpan.textContent = `${totalCAEValue.toFixed(2)} €`;
